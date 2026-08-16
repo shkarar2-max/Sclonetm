@@ -1,12 +1,24 @@
 <!DOCTYPE html>
-<html lang="ru">
-  <head>
+<html>
+<head lang="ru">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SCLONE™</title>
     <link rel="stylesheet" href="style.css">
-  </head>
+</head>
   <body>
+    <!-- Окно авторизации -->
+  <div class="auth-overlay" id="auth-overlay">
+    <div class="auth-box">
+      <h2>ТРЕБУЕТСЯ КЛЮЧ ДОСТУПА</h2>
+      <p>Для просмотра загрузите ключ</p>
+      
+      <label for="passkey-input" class="file-upload-btn">Загрузить PASSKEY</label>
+      <input type="file" id="passkey-input">
+      
+      <div class="auth-error" id="auth-error">Access Denied.</div>
+    </div>
+  </div>
     <nav>
       <a href="almz.html">Алмаз нестабильности</a>
     </nav>
@@ -17,7 +29,7 @@
         <a href="workers.html">Рабочие</a>
         <a href="files.html">Статьи</a>
     </nav>
-  <script>
+      <script>
     // === ВОТ ЗДЕСЬ ТЕПЕРЬ ПРАВИЛЬНАЯ ПРОВЕРКА ПО БАЙТАМ ===
     const authOverlay = document.getElementById('auth-overlay');
     const passkeyInput = document.getElementById('passkey-input');
@@ -98,5 +110,6 @@
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.classList.remove('active');
     });
-        </script>
+      </script>
   </body>
+</html>
