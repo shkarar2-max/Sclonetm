@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вакансии</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+<body>
+
+    <div align="center">
+        <!-- Шапка -->
+        <h1>SCLONE™</h1>
+        <hr size="2" color="#000080" width="80%">
+        <h2>Вакансии и карьера</h2>
+    </div>
+
+    <div style="margin: 20px 10%; font-family: Verdana, sans-serif; line-height: 1.6;">
+
+        <!-- Блок о приёме на работу -->
+        <div style="background-color: #FFA500; padding: 15px; border: 2px solid #000000;">
+            <h3 style="margin-top: 0; color: #000000;">Можно ли подать заявку на работу?</h3>
+            <p>
+                <strong>SCLONE™</strong> постоянно находится в поиске перспективных личностей
+                готовых работать в динамичной научной среде. Мы предлагаем уникальный опыт, 
+                полную конфиденциальность и участие в разных интересных проектах.
+            </p>
+        </div>
+
+        <br>
+
+        <!-- Требования -->
+        <div style="background-color: #FFFFFF; padding: 15px; border: 1px dashed #000080;">
+            <h4>Требуемый опыт работы:</h4>
+            <ul>
+                <li>Опыт работы <strong>не нужен!</strong> Опыт работы приветствуется, но для вступления не требуется.</li>
+                <li>Заинтересованость биологией, химией, и астрофизикой.</li>
+                <li>Готовность работать под землёй и с ограниченным количеством кислорода.</li>
+                <li>Отсутсвие проблем с дыханием(желательно, но есть возможность занять более лёгкую вакансию)</li>
+                <li>Наличие харизмы и чувства юмора(желательно)</li>
+                <li>Остальная информация будет раскрыта на собеседовании.</li>
+            </ul>
+        </div>
+
+        <br>
+
+        <!-- Блок очного собеседования -->
+        <div style="background-color: #008080; color: #FFFFFF; padding: 20px; border: 2px solid #000000;">
+            <h3 style="margin-top: 0; color: #FFFF00; align: center;">Инструкция по подаче заявки</h3>
+            <p>
+              Собеседование проводиться на заданной ниже территории, если координаты показывают озеро, значит вы должны найти лодку/корабль, в остальных случаях вы должны найти рекрута, который будет стоять на месте, либо он будет в машине.
+            </p>
+            <p>
+                Ниже сгенерированы GPS координаты точки где будет проводиться собеседование. Рекомендовано смотреть их через Google Maps или другой сервис карт. Если вы не имеете доступ к координатам то сгенерируйте новые.
+            </p>
+
+            <!-- Поле с координатами -->
+<div style="background-color: #000000; padding: 15px; font-family: Verdana; font-size: 1.2em; text-align: center; border: 1px solid">
+    <span>Координаты: </span>
+    <span id="coordinates">Нажмите кнопку для генерации</span>
+    <br><br>
+    <button id="generate-btn" style="padding: 8px 16px; font-family: Verdana; font-size: 0.9em; cursor: pointer;">
+        Сгенерировать
+    </button>
+</div>
+            
+            <p style="font-size: 0.85em; color: #E0E0E0; margin-bottom: 0;">
+                * Примечание:Координаты действительны в течении 24 часов
+            </p>
+        </div>
+
+    </div>
+    
+<script>
+  // Bounding box Европы
+  const BBOX = {
+    minLat: 36.0,
+    maxLat: 70.0,
+    minLon: -9.5,
+    maxLon: 35.0
+  };
+
+  function getRandomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  // Проверка координат через OpenStreetMap API
+  async function checkIsLand(lat, lon) {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`;
+    
+    try {
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'RandomCoordsApp/1.0' }
+      });
+      const data = await response.json();
+
+      if (data.error) return false;
+
+      const category = data.category || '';
+      const type = data.type || '';
+      if (category === 'natural' && (type === 'water' || type === 'sea' || type === 'bay')) {
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async function generateLandPoint() {
+    const coordsElem = document.getElementById('coordinates');
+    const btn = document.getElementById('generate-btn');
+    
+    btn.disabled = true;
+    coordsElem.innerText = 'Поиск суши...';
+
+    let isFound = false;
+    let lat, lon;
+    let attempts = 0;
+
+    while (!isFound && attempts < 20) {
+      attempts++;
+      lat = getRandomInRange(BBOX.minLat, BBOX.maxLat).toFixed(6);
+      lon = getRandomInRange(BBOX.minLon, BBOX.maxLon).toFixed(6);
+
+      coordsElem.innerText = `Проверка (${attempts})...`;
+
+      // Пауза 300мс между запросами к API
+      await new Promise(r => setTimeout(r, 300));
+
+      isFound = await checkIsLand(lat, lon);
+    }
+
+    btn.disabled = false;
+
+    if (isFound) {
+      coordsElem.innerText = `${lat}, ${lon}`;
+    } else {
+      coordsElem.innerText = 'Ошибка, попробуйте еще раз';
+    }
+  }
+
+  document.getElementById('generate-btn').addEventListener('click', generateLandPoint);
+</script>
+
+    <br><br>
+
+    <!-- Нижнее навигационное меню (Футер) -->
+    <nav class="navbar">
+        <a href="index.html">Главная</a>
+        <a href="about.html">О нас</a>
+        <a href="apply.html">Вакансии</a>
+        <a href="workers.html">Рабочие</a>
+        <a href="files.html">Статьи</a>
+    </nav>
+
+</body>
+</html>

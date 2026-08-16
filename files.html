@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCLONE™</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <nav>
+      <a href="almz.html">Алмаз нестабильности</a>
+    </nav>
+    <nav class="navbar">
+        <a href="index.html">Главная</a>
+        <a href="about.html">О нас</a>
+        <a href="apply.html">Вакансии</a>
+        <a href="workers.html">Рабочие</a>
+        <a href="files.html">Статьи</a>
+    </nav>
+  <script>
+    // === ВОТ ЗДЕСЬ ТЕПЕРЬ ПРАВИЛЬНАЯ ПРОВЕРКА ПО БАЙТАМ ===
+    const authOverlay = document.getElementById('auth-overlay');
+    const passkeyInput = document.getElementById('passkey-input');
+    const authError = document.getElementById('auth-error');
+
+    // Твой точный вес в байтах
+    const SECRET_SIZE = 876;
+
+    // Если ключ уже принят
+    if (localStorage.getItem('sclone_passkey_granted') === 'true') {
+      authOverlay.style.display = 'none';
+    }
+
+    passkeyInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // ПРОВЕРКА: Весит ли файл ровно 876 байт?
+      if (file.size === SECRET_SIZE) {
+        // Успех
+        localStorage.setItem('sclone_passkey_granted', 'true');
+        authOverlay.style.display = 'none';
+        authError.style.display = 'none';
+      } else {
+        // Ошибка
+        authError.style.display = 'block';
+        passkeyInput.value = ''; // Сброс неверного файла
+      }
+    });
+
+    // === КОД БЕСКОНЕЧНОГО СПИСКА (без изменений) ===
+    const container = document.getElementById('container');
+    const sentinel = document.getElementById('sentinel');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalClose = document.getElementById('modal-close');
+
+    let counter = 2;
+    const batchSize = 20;
+    const customItems = {};
+
+    function loadMoreItems() {
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < batchSize; i++) {
+        const item = document.createElement('span');
+        item.classList.add('link-item');
+        item.dataset.id = counter;
+        item.textContent = `Сус ${counter}`;
+        fragment.appendChild(item);
+        counter++;
+      }
+      container.appendChild(fragment);
+    }
+    loadMoreItems();
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) loadMoreItems();
+      });
+    }, { rootMargin: '200px' });
+    observer.observe(sentinel);
+
+    container.addEventListener('click', (e) => {
+      const link = e.target.closest('.link-item');
+      if (!link) return;
+      const id = link.dataset.id;
+      modalTitle.textContent = `Сус ${id}`;
+      if (customItems[id]) {
+        modalDesc.textContent = customItems[id];
+      } else {
+        modalDesc.textContent = `Информации о Сусе ${id} не найдено, подождите загрузки серверов.`;
+      }
+      modal.classList.add('active');
+    });
+
+    modalClose.addEventListener('click', () => modal.classList.remove('active'));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+        </script>
+  </body>
